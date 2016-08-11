@@ -11,7 +11,7 @@ var Metacontent = app.get('models').Metacontent;
 var sequelize = app.get('models').sequelize;
 
 
-var port = process.env.PORT || 8081;
+var port = process.env.PORT || 8089;
 var router = express.Router({
 	mergeParams : true
 });
