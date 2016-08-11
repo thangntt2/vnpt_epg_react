@@ -1,0 +1,8 @@
+{
+	"database": {
+		"database"	: "vnpt_epg",
+		"user"		: "root",
+		"password" 	: "root",
+		"port"		: 8889
+	}
+}
