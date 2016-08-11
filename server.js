@@ -8,6 +8,7 @@ app.set('models', require('./models'));
 var Channel = app.get('models').Channel;
 var Keyword = app.get('models').Keyword;
 var Metacontent = app.get('models').Metacontent;
+var sequelize = app.get('models').sequelize;
 
 
 var port = process.env.PORT || 8081;
@@ -23,7 +24,7 @@ app.use(bodyParser.json());
 router.get('/channels', function (req, res) {
    	Channel.findAll()
    	.then(function(listChannels) {
-   		res.set('Content-Type', 'application/json');
+   		res.set('Content-Type', 'application/json; charset=utf-8');
    		res.end(JSON.stringify(listChannels));
    	});
 });
@@ -88,14 +89,13 @@ router.route('/channels/:id/keywords')
 			}
 		})
 		.then(function(listKeywords){
-			res.set('Content-Type', 'application/json');
+			res.set('Content-Type', 'application/json; charset=utf-8');
    			res.end(JSON.stringify(listKeywords));	
 		})
 	})
 
-router.route('/metacontents/search')
+router.route('/metacontents/queryWiki')
 	.get(function(req, res) {
-		console.log("wtf: " + req.query.entity);
 		var request = require('request');
 		request({	
 			url:'http://127.0.0.1:8080/wiki_search',
@@ -107,6 +107,16 @@ router.route('/metacontents/search')
 			, function(err, response, body) {
 				body.category = req.query.category;
 				res.end(JSON.stringify(body));
+			})
+	})
+
+router.route('/metacontents/search')
+	.get(function(req, res) {
+		sequelize.query('select title from vi_wiki_title where LOWER(title) like LOWER(?) collate utf8_bin',
+			{ replacements: [req.query.entity + "%"], type: sequelize.QueryTypes.SELECT}
+			).then(function(titles){
+				res.set('Content-Type', 'application/json; charset=utf-8');
+				res.end(JSON.stringify(titles));
 			})
 	})
 
@@ -145,7 +155,7 @@ router.route('/channels/:id/metacontents')
 			}
 		})
 		.then(function(listMetacontents){
-			res.set('Content-Type', 'application/json');
+			res.set('Content-Type', 'application/json; charset=utf-8');
    			res.end(JSON.stringify(listMetacontents));	
 		})	
 	})
@@ -187,7 +197,7 @@ router.route('/channels/:channel_id/metacontens')
 router.get('/channels/:id', function(req, res) {
 	Channel.findById(req.params.id)
 	.then(function(channel) {
-   		res.set('Content-Type', 'application/json');
+   		res.set('Content-Type', 'application/json; charset=utf-8');
    		res.end(JSON.stringify(channel));
    	});
 });
@@ -199,7 +209,7 @@ router.get('/channels/number/:number', function(req, res) {
 		}
 	})
 	.then(function(channel) {
-   		res.set('Content-Type', 'application/json');
+   		res.set('Content-Type', 'application/json; charset=utf-8');
    		res.end(JSON.stringify(channel));
    	});
 });
