@@ -10,10 +10,29 @@ var Keyword = app.get('models').Keyword;
 var Metacontent = app.get('models').Metacontent;
 var sequelize = app.get('models').sequelize;
 
+var config = require('config').database;
+var knex = require('knex')({
+  client: 'mysql',
+  connection: {
+    host     : config.host,
+    port	 : config.port,
+    user     : config.user,
+    password : config.password,
+    database : config.database
+  }
+});
 
 var port = process.env.PORT || 8089;
 var router = express.Router({
 	mergeParams : true
+});
+
+var wikibot = require('nodemw');
+
+var client = new wikibot({
+	server : 'vi.wikipedia.org',
+	path:'/w',
+	debug: false
 });
 
 
@@ -94,30 +113,53 @@ router.route('/channels/:id/keywords')
 		})
 	})
 
-router.route('/metacontents/queryWiki')
+router.route('/metacontents/search')
 	.get(function(req, res) {
-		var request = require('request');
-		request({	
-			url:'http://127.0.0.1:8080/wiki_search',
-			method:'GET',
-			qs:{
-				entity:req.query.entity
-			},
-			json: true}
-			, function(err, response, body) {
-				body.category = req.query.category;
-				res.end(JSON.stringify(body));
+		console.log("wtf " + req.query.entity);
+		knex('vi_wiki_title')
+			.select('title')
+			.whereRaw('LOWER(title) like LOWER(?) collate utf8_bin'
+				, [req.query.entity + "%"])
+			.asCallback(function(err, titles) {
+				rawtt = [];
+				res.set('Content-Type', 'application/json; charset=utf-8');
+				for (var i = 0; i < titles.length; i++) {
+					rawtt.push(titles[i].title);
+				}
+				res.end(JSON.stringify(rawtt));
 			})
 	})
 
-router.route('/metacontents/search')
+
+const getFirstItem = function(obj) {
+	const key = Object.keys(obj).shift();
+	return obj[key];
+};
+
+router.route('/metacontents/query_wiki')
 	.get(function(req, res) {
-		sequelize.query('select title from vi_wiki_title where LOWER(title) like LOWER(?) collate utf8_bin',
-			{ replacements: [req.query.entity + "%"], type: sequelize.QueryTypes.SELECT}
-			).then(function(titles){
-				res.set('Content-Type', 'application/json; charset=utf-8');
-				res.end(JSON.stringify(titles));
-			})
+		var entity = req.query.entity;
+		res.set('Content-Type', 'application/json; charset=utf-8');
+		params = {
+			format	: 'xml',
+			action 	: 'query',
+			continue : '',
+			prop 	: 'extracts|pageimages',
+			exintro	: '',
+			explaintext: '',
+			rvprop	: 'timestamp|user|comment|content',
+			titles	: entity,
+			pithumbsize	: '400'
+		}
+		client.api.call(params, function(err, info, next, data) {
+			var wikiPage = getFirstItem(data.query.pages);
+			var ret = {};
+			ret.name = wikiPage.title;
+			ret.url = "https://vi.wikipedia.org/" + entity.replace(" ","_");
+			ret.image = wikiPage.thumbnail.source;
+			ret.description = wikiPage.extract;
+			res.end(JSON.stringify(ret));
+		});
 	})
 
 router.route('/channels/:id/metacontents')
