@@ -11,7 +11,9 @@ var knex = require('knex')({
   }
 });
 
-knex.schema.createTableIfNotExists('vi_wiki_title', function(table) {
+var DB_NAME = "vi_wiki_title";
+
+knex.schema.createTableIfNotExists(DB_NAME, function(table) {
 	table.increments();
 	table.string('title');
 	table.charset('utf8');
@@ -26,7 +28,7 @@ knex.schema.createTableIfNotExists('vi_wiki_title', function(table) {
 })
 
 var inserted = 0;
-knex('vi_wiki_title')
+knex(DB_NAME)
 	.count()
 	.asCallback(function(err, count) {
 		var count = count[0]['count(*)'];
@@ -36,23 +38,22 @@ knex('vi_wiki_title')
 			var lineReader = require('line-reader');
 			lineReader.eachLine('viwiki_titles', function(line, last) {
 				if (!last) {
-					knex('vi_wiki_title')
+					knex(DB_NAME)
 							.insert({title:line.replace("_"," ")})
-							.asCallback(function(err) {
-								if (err) {
-									console.error(err);
-									} else {
-										inserted++;
-										if (inserted % 100000 == 0) {
-											console.log("inserted " + inserted + " records");
-										}
-									}
-							});
-					} else {
-							knex.destroy(function() {
-								console.log("done");
+							.catch(function(err) {
+								console.error(err);
 							})
-						}
+							.then(function() {
+								inserted++;
+								if (inserted % 10000 == 0) {
+									console.log("inserted " + inserted + " records");
+								}
+							});
+				} else {
+						knex.destroy(function() {
+							console.log("done");
+						})
+				}
 			});
 		}
 	});
