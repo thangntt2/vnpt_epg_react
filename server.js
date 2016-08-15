@@ -115,18 +115,24 @@ router.route('/channels/:id/keywords')
 
 router.route('/metacontents/search')
 	.get(function(req, res) {
-		console.log("wtf " + req.query.entity);
 		knex('vi_wiki_title')
 			.select('title')
 			.whereRaw('LOWER(title) like LOWER(?) collate utf8_bin'
 				, [req.query.entity + "%"])
-			.asCallback(function(err, titles) {
+			.then(function(titles) {
 				rawtt = [];
 				res.set('Content-Type', 'application/json; charset=utf-8');
-				for (var i = 0; i < titles.length; i++) {
-					rawtt.push(titles[i].title);
+				if (titles) {
+					for (var i = 0; i < titles.length; i++) {
+						rawtt.push(titles[i].title);
+					}
+					res.end(JSON.stringify(rawtt));
+				} else {
+					res.end("[]");
 				}
-				res.end(JSON.stringify(rawtt));
+			})
+			.catch(function(err) {
+				console.error(err);
 			})
 	})
 

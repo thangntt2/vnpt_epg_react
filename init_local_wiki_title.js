@@ -7,7 +7,8 @@ var knex = require('knex')({
     port	 : config.port,
     user     : config.user,
     password : config.password,
-    database : config.database
+    database : config.database,
+    charset  : "utf8mb4"
   }
 });
 
@@ -16,9 +17,9 @@ var DB_NAME = "vi_wiki_title";
 knex.schema.createTableIfNotExists(DB_NAME, function(table) {
 	table.increments();
 	table.string('title');
-	table.charset('utf8');
+	table.charset('utf8mb4');
 	table.engine('InnoDB');
-	table.collate('utf8_bin');
+	table.collate('utf8mb4_bin');
 }).asCallback(function(err) {
 	if (err) {
 		console.err(err);
@@ -35,25 +36,48 @@ knex(DB_NAME)
 		if (count > 1000000) {
 			console.log("database created, no need to re-create!");
 		} else {
-			var lineReader = require('line-reader');
-			lineReader.eachLine('viwiki_titles', function(line, last) {
-				if (!last) {
-					knex(DB_NAME)
-							.insert({title:line.replace("_"," ")})
-							.catch(function(err) {
-								console.error(err);
-							})
-							.then(function() {
-								inserted++;
-								if (inserted % 10000 == 0) {
-									console.log("inserted " + inserted + " records");
-								}
-							});
-				} else {
-						knex.destroy(function() {
-							console.log("done");
-						})
-				}
-			});
+			var lineByLine = require('n-readlines');
+			var liner = new lineByLine('./viwiki_titles');
+
+			loop = function(line) {
+			    num = batch_line.push({title: line.toString().replace("_"," ")});
+			    if (num == 1000) {
+			    	knex.batchInsert(DB_NAME, batch_line, 1000)
+			    		.then(function() {
+			    			inserted += 1000;
+			    			console.log("inserted " + inserted + " records");
+			    			batch_line = [];
+			    			line = liner.next();
+			    			if (line)
+			    				loop(line);
+			    			else {
+			    				console.log("done");
+			    				knex.destroy(function() {
+									console.log("done");
+								})
+			    			}
+			    		})
+			    		.catch(function(err){
+			    			console.log(err);
+			    		});
+			    } else {
+			    	line = liner.next();
+			    	if (line)
+	    				loop(line);
+	    			else {
+	    				knex.batchInsert(DB_NAME, batch_line, 1000)
+			    			.then(function() {
+			    				knex.destroy(function() {
+									console.log("done");
+								});
+	    					});
+	    			}
+			    }
+			}
+
+			var line;
+			var batch_line = [];
+			line = liner.next();
+			loop(line);
 		}
 	});
