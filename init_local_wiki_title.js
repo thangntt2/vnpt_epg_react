@@ -35,6 +35,9 @@ knex(DB_NAME)
 		var count = count[0]['count(*)'];
 		if (count > 1000000) {
 			console.log("database created, no need to re-create!");
+			knex.destroy(function() {
+				console.log("done");
+			});
 		} else {
 			var lineByLine = require('n-readlines');
 			var liner = new lineByLine('./viwiki_titles');
