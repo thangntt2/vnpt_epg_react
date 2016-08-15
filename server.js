@@ -115,9 +115,13 @@ router.route('/channels/:id/keywords')
 
 router.route('/metacontents/search')
 	.get(function(req, res) {
+		if (req.query.entity.length() == 0) {
+			res.end("[]");
+			return;
+		}
 		knex('vi_wiki_title')
 			.select('title')
-			.whereRaw('LOWER(title) like LOWER(?) collate utf8_bin'
+			.whereRaw('LOWER(title) like LOWER(?) collate utf8_bin limit 8'
 				, [req.query.entity + "%"])
 			.then(function(titles) {
 				rawtt = [];
