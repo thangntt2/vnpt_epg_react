@@ -28,6 +28,13 @@ knex.schema.createTableIfNotExists(DB_NAME, function(table) {
 	}
 })
 
+replaceAll = function(string, omit, place, prevstring) {
+  if (prevstring && string === prevstring)
+    return string;
+  prevstring = string.replace(omit, place);
+  return replaceAll(prevstring, omit, place, string)
+}
+
 var inserted = 0;
 knex(DB_NAME)
 	.count()
@@ -43,7 +50,7 @@ knex(DB_NAME)
 			var liner = new lineByLine('./viwiki_titles');
 
 			loop = function(line) {
-			    num = batch_line.push({title: line.toString().replace("/_/g"," ")});
+			    num = batch_line.push({title: replaceAll(line.toString(), "_", " ")});
 			    if (num == 1000) {
 			    	knex.batchInsert(DB_NAME, batch_line, 1000)
 			    		.then(function() {
