@@ -43,7 +43,7 @@ knex(DB_NAME)
 			var liner = new lineByLine('./viwiki_titles');
 
 			loop = function(line) {
-			    num = batch_line.push({title: line.toString().replace("_"," ")});
+			    num = batch_line.push({title: line.toString().replace("/_/g"," ")});
 			    if (num == 1000) {
 			    	knex.batchInsert(DB_NAME, batch_line, 1000)
 			    		.then(function() {
