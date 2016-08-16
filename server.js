@@ -44,7 +44,7 @@ router.get('/channels', function (req, res) {
    	Channel.findAll()
    	.then(function(listChannels) {
    		res.set('Content-Type', 'application/json; charset=utf-8');
-   		res.end(JSON.stringify(listChannels));
+   		res.end("jsonCallback("+JSON.stringify(listChannels)+");");
    	});
 });
 
@@ -109,14 +109,14 @@ router.route('/channels/:id/keywords')
 		})
 		.then(function(listKeywords){
 			res.set('Content-Type', 'application/json; charset=utf-8');
-   			res.end(JSON.stringify(listKeywords));	
+   			res.end("jsonCallback("+JSON.stringify(listKeywords)+");");	
 		})
 	})
 
 router.route('/metacontents/search')
 	.get(function(req, res) {
-		if (req.query.entity.length() == 0) {
-			res.end("[]");
+		if (req.query.entity.length == 0) {
+			res.end("jsonCallback([]);");
 			return;
 		}
 		knex('vi_wiki_title')
@@ -130,9 +130,9 @@ router.route('/metacontents/search')
 					for (var i = 0; i < titles.length; i++) {
 						rawtt.push(titles[i].title);
 					}
-					res.end(JSON.stringify(rawtt));
+					res.end("jsonCallback("+JSON.stringify(rawtt)+");");
 				} else {
-					res.end("[]");
+					res.end("jsonCallback([]);");
 				}
 			})
 			.catch(function(err) {
@@ -168,7 +168,7 @@ router.route('/metacontents/query_wiki')
 			ret.url = "https://vi.wikipedia.org/" + entity.replace(" ","_");
 			ret.image = wikiPage.thumbnail.source;
 			ret.description = wikiPage.extract;
-			res.end(JSON.stringify(ret));
+			res.end("jsonCallback("+JSON.stringify(ret)+");");
 		});
 	})
 
@@ -208,7 +208,7 @@ router.route('/channels/:id/metacontents')
 		})
 		.then(function(listMetacontents){
 			res.set('Content-Type', 'application/json; charset=utf-8');
-   			res.end(JSON.stringify(listMetacontents));	
+   			res.end("jsonCallback("+JSON.stringify(listMetacontents)+");");	
 		})	
 	})
 
@@ -250,7 +250,7 @@ router.get('/channels/:id', function(req, res) {
 	Channel.findById(req.params.id)
 	.then(function(channel) {
    		res.set('Content-Type', 'application/json; charset=utf-8');
-   		res.end(JSON.stringify(channel));
+   		res.end("jsonCallback("+JSON.stringify(channel)+");");
    	});
 });
 
@@ -262,7 +262,7 @@ router.get('/channels/number/:number', function(req, res) {
 	})
 	.then(function(channel) {
    		res.set('Content-Type', 'application/json; charset=utf-8');
-   		res.end(JSON.stringify(channel));
+   		res.end("jsonCallback("+JSON.stringify(channel)+");");
    	});
 });
 
