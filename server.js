@@ -146,6 +146,13 @@ const getFirstItem = function(obj) {
 	return obj[key];
 };
 
+replaceAll = function(string, omit, place, prevstring) {
+  if (prevstring && string === prevstring)
+    return string;
+  prevstring = string.replace(omit, place);
+  return replaceAll(prevstring, omit, place, string)
+}
+
 router.route('/metacontents/query_wiki')
 	.get(function(req, res) {
 		var entity = req.query.entity;
@@ -165,7 +172,7 @@ router.route('/metacontents/query_wiki')
 			var wikiPage = getFirstItem(data.query.pages);
 			var ret = {};
 			ret.name = wikiPage.title;
-			ret.url = "https://vi.wikipedia.org/" + entity.replace(" ","_");
+			ret.url = "https://vi.wikipedia.org/" + replaceAll(entity, " ", "_");
 			ret.image = wikiPage.thumbnail.source;
 			ret.description = wikiPage.extract;
 			res.end("jsonCallback("+JSON.stringify(ret)+");");
