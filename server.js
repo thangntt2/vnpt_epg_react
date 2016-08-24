@@ -1,3 +1,5 @@
+var search_vne = require('./vnexpress_scrape').serach_vne;
+var scrape_vne = require('./vnexpress_scrape').scrape_vne;
 var express = require('express');
 var app = express();
 var fs = require("fs");
@@ -26,7 +28,8 @@ var port = process.env.PORT || 8089;
 var router = express.Router({
 	mergeParams : true
 });
-
+const AuthURL = 'https://thangntt.au.auth0.com/oauth/ro';
+var request = require('request');
 var wikibot = require('nodemw');
 
 var client = new wikibot({
@@ -34,7 +37,6 @@ var client = new wikibot({
 	path:'/w',
 	debug: false
 });
-
 
 app.use(bodyParser.urlencoded({ extended: true}));
 app.use(bodyParser.json());
@@ -283,6 +285,19 @@ router.route('/channels')
 			res.sendStatus(201);
 			res.end("Channel created with id = " + channel.id);
 		});
+	})
+
+router.route('/metacontents/query_news')
+	.get(function(req, res) {
+		var ret = [];
+		if (req.query.sites.indexOf('vnexpress')) {
+			search_vne(req.query.entity)
+				.then(function(articles) {
+					ret.push(articles)
+				})
+		}
+		res.set('Content-Type', 'application/json; charset=utf-8');
+		res.end("jsonCallback(" + JSON.stringify(ret) + ");")
 	})
 
 app.use('/api', router);
