@@ -293,10 +293,11 @@ router.route('/metacontents/query_news')
 			vne_scrape.search_vne(req.query.entity)
 				.then(function(articles) {
 					ret.push(articles)
+					res.set('Content-Type', 'application/json; charset=utf-8');
+					res.end("jsonCallback(" + JSON.stringify(ret) + ");")
 				})
 		}
-		res.set('Content-Type', 'application/json; charset=utf-8');
-		res.end("jsonCallback(" + JSON.stringify(ret) + ");")
+		
 	})
 
 app.use('/api', router);
