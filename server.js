@@ -1,5 +1,4 @@
-var search_vne = require('./vnexpress_scrape').serach_vne;
-var scrape_vne = require('./vnexpress_scrape').scrape_vne;
+var vne_scrape = require('./vnexpress_scrape')
 var express = require('express');
 var app = express();
 var fs = require("fs");
@@ -291,7 +290,7 @@ router.route('/metacontents/query_news')
 	.get(function(req, res) {
 		var ret = [];
 		if (req.query.sites.indexOf('vnexpress')) {
-			search_vne(req.query.entity)
+			vne_scrape.search_vne(req.query.entity)
 				.then(function(articles) {
 					ret.push(articles)
 				})
