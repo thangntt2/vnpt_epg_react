@@ -40,7 +40,7 @@ var search = function(term) {
 			}
 		}
 	}).then(ret => {
-		return Promise.resolve(ret.filter(function(article) {
+		return Promise.resolve(ret.articles.filter(function(article) {
 			return article.link.indexOf('camera-ban-doc') === -1;
 		}))
 	})

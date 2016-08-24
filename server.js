@@ -174,7 +174,9 @@ router.route('/metacontents/query_wiki')
 			var ret = {};
 			ret.name = wikiPage.title;
 			ret.url = "https://vi.wikipedia.org/" + replaceAll(entity, " ", "_");
-			ret.image = wikiPage.thumbnail.source;
+			if (wikiPage.thumbnail) {
+				ret.image = wikiPage.thumbnail.source;
+			}
 			ret.description = wikiPage.extract;
 			res.end("jsonCallback("+JSON.stringify(ret)+");");
 		});
@@ -288,13 +290,11 @@ router.route('/channels')
 
 router.route('/metacontents/query_news')
 	.get(function(req, res) {
-		var ret = [];
 		if (req.query.sites.indexOf('vnexpress')) {
 			vne_scrape.search_vne(req.query.entity)
 				.then(function(articles) {
-					ret.push(articles)
 					res.set('Content-Type', 'application/json; charset=utf-8');
-					res.end("jsonCallback(" + JSON.stringify(ret) + ");")
+					res.end("jsonCallback(" + JSON.stringify(articles) + ");")
 				})
 		}
 		
