@@ -48,7 +48,7 @@ router.get('/channels', function (req, res) {
    	.then(function(listChannels) {
 		res.set("Access-Control-Allow-Origin", "*");
    		res.set('Content-Type', 'application/json; charset=utf-8');
-   		res.end("jsonCallback("+JSON.stringify(listChannels)+");");
+   		res.end(JSON.stringify(listChannels));
    	});
 });
 
@@ -113,14 +113,14 @@ router.route('/channels/:id/keywords')
 		})
 		.then(function(listKeywords){
 			res.set('Content-Type', 'application/json; charset=utf-8');
-   			res.end("jsonCallback("+JSON.stringify(listKeywords)+");");	
+   			res.end(JSON.stringify(listKeywords));	
 		})
 	})
 
 router.route('/metacontents/search')
 	.get(function(req, res) {
 		if (req.query.entity.length == 0) {
-			res.end("jsonCallback([]);");
+			res.end("[]");
 			return;
 		}
 		knex('vi_wiki_title')
@@ -134,9 +134,9 @@ router.route('/metacontents/search')
 					for (var i = 0; i < titles.length; i++) {
 						rawtt.push(titles[i].title);
 					}
-					res.end("jsonCallback("+JSON.stringify(rawtt)+");");
+					res.end(JSON.stringify(rawtt));
 				} else {
-					res.end("jsonCallback([]);");
+					res.end("[]");
 				}
 			})
 			.catch(function(err) {
@@ -181,7 +181,7 @@ router.route('/metacontents/query_wiki')
 				ret.image = wikiPage.thumbnail.source;
 			}
 			ret.description = wikiPage.extract;
-			res.end("jsonCallback("+JSON.stringify(ret)+");");
+			res.end(JSON.stringify(ret));
 		});
 	})
 
@@ -221,7 +221,7 @@ router.route('/channels/:id/metacontents')
 		})
 		.then(function(listMetacontents){
 			res.set('Content-Type', 'application/json; charset=utf-8');
-   			res.end("jsonCallback("+JSON.stringify(listMetacontents)+");");	
+   			res.end(JSON.stringify(listMetacontents));	
 		})	
 	})
 
@@ -263,7 +263,7 @@ router.get('/channels/:id', function(req, res) {
 	Channel.findById(req.params.id)
 	.then(function(channel) {
    		res.set('Content-Type', 'application/json; charset=utf-8');
-   		res.end("jsonCallback("+JSON.stringify(channel)+");");
+   		res.end(JSON.stringify(channel));
    	});
 });
 
@@ -275,7 +275,7 @@ router.get('/channels/number/:number', function(req, res) {
 	})
 	.then(function(channel) {
    		res.set('Content-Type', 'application/json; charset=utf-8');
-   		res.end("jsonCallback("+JSON.stringify(channel)+");");
+   		res.end(JSON.stringify(channel));
    	});
 });
 
@@ -297,7 +297,7 @@ router.route('/metacontents/query_news')
 			vne_scrape.search_vne(req.query.entity)
 				.then(function(articles) {
 					res.set('Content-Type', 'application/json; charset=utf-8');
-					res.end("jsonCallback(" + JSON.stringify(articles) + ");")
+					res.end(JSON.stringify(articles))
 				})
 		}
 		
