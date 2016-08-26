@@ -1,3 +1,4 @@
+var cors = require('cors')
 var vne_scrape = require('./vnexpress_scrape')
 var express = require('express');
 var app = express();
@@ -5,6 +6,7 @@ var fs = require("fs");
 var bodyParser = require('body-parser');
 var JSON = require('JSON2');
 
+app.use(cors())
 app.set('models', require('./models'));
 var Channel = app.get('models').Channel;
 var Keyword = app.get('models').Keyword;
@@ -44,6 +46,7 @@ app.use(bodyParser.json());
 router.get('/channels', function (req, res) {
    	Channel.findAll()
    	.then(function(listChannels) {
+		res.set("Access-Control-Allow-Origin", "*");
    		res.set('Content-Type', 'application/json; charset=utf-8');
    		res.end("jsonCallback("+JSON.stringify(listChannels)+");");
    	});
@@ -303,8 +306,9 @@ router.route('/metacontents/query_news')
 app.use('/api', router);
 
 app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+    res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header("Access-Control-Allow-Credentials",true);
     next();
 });
 
