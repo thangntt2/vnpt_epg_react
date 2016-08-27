@@ -290,6 +290,15 @@ router.route('/channels')
 			res.end("Channel created with id = " + channel.id);
 		});
 	})
+	
+router.route('/metacontents/all')
+	.get(function(req, res) {
+		Metacontent.findAll()
+		.then(function(metacontens) {
+			res.set('Content-Type', 'application/json; charset=utf-8')
+			res.end(JSON.stringify(metacontens))
+		})
+	})
 
 router.route('/metacontents/query_news')
 	.get(function(req, res) {
