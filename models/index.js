@@ -8,7 +8,8 @@ var sequelize = new Sequelize(
 	config.password, {
 		host : config.host,
 		port : config.port
-	});
+	},
+	define: {charset: 'utf8mb4', collate:'utf8mb4_bin'});
 
 var models = [
 	'Channel',
