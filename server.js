@@ -229,7 +229,7 @@ router.route('/channels/:channel_id/metacontents')
 	.delete(function(req, res) {
 		Metacontent.destroy({
 			where: {
-				id 			: req.query.id,
+				id 			: req.body.id,
 				ChannelId 	: req.params.channel_id
 			}
 		})
