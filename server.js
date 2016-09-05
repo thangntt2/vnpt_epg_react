@@ -299,8 +299,17 @@ router.route('/metacontents/:metacontent_id')
 				res.end(JSON.stringify(metacontent))	
 			})
 	})
+
+router.route('/keywords/:keyword_id')
+	.get(function(req, res) {
+		Keyword.findById(res.params.keyword_id)
+			.then(function(keyword) {
+				res.set('Content-Type', 'application/json; charset=utf-8')
+				res.end(JSON.stringify(keyword))		
+			})
+	})
 	
-router.route('/metacontents/all')
+router.route('/metacontents')
 	.get(function(req, res) {
 		Metacontent.findAll()
 		.then(function(metacontens) {
@@ -331,7 +340,7 @@ router.route('/metacontents/search_news')
 		
 	})
 
-router.route('/keywords/all')
+router.route('/keywords')
 	.get(function(req, res) {
 		Keyword.findAll()
 			.then(function(keywords) {
