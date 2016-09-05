@@ -176,7 +176,7 @@ router.route('/metacontents/query_wiki')
 			var wikiPage = getFirstItem(data.query.pages);
 			var ret = {};
 			ret.name = wikiPage.title;
-			ret.url = "https://vi.wikipedia.org/" + replaceAll(entity, " ", "_");
+			ret.url = "https://vi.wikipedia.org/wiki/" + replaceAll(entity, " ", "_");
 			if (wikiPage.thumbnail) {
 				ret.image = wikiPage.thumbnail.source;
 			}
@@ -299,8 +299,18 @@ router.route('/metacontents/all')
 			res.end(JSON.stringify(metacontens))
 		})
 	})
-
 router.route('/metacontents/query_news')
+	.get(function(req,res) {
+		let url = req.query.url
+		if (url.indexOf('vnexpress') > -1) {
+			res.set('Content-Type', 'application/json; charset=utf-8')
+			vne_scrape.scrape_vne(url)
+				.then(function(article) {
+					res.end(JSON.stringify(article))
+				})
+		}
+	})
+router.route('/metacontents/search_news')
 	.get(function(req, res) {
 		if (req.query.sites.indexOf('vnexpress')) {
 			vne_scrape.search_vne(req.query.entity)
@@ -311,6 +321,8 @@ router.route('/metacontents/query_news')
 		}
 		
 	})
+
+
 
 app.use('/api', router);
 
