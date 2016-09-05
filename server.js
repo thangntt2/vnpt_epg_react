@@ -322,6 +322,14 @@ router.route('/metacontents/search_news')
 		
 	})
 
+router.route('/keywords/all')
+	.get(function(req, res) {
+		Keyword.findAll()
+			.then(function(keywords) {
+				res.set('Content-Type', 'application/json; charset=utf-8')
+				res.end(JSON.stringify(keywords))
+			})
+	})
 
 
 app.use('/api', router);
