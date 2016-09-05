@@ -293,7 +293,7 @@ router.route('/channels')
 
 router.route('/metacontents/:metacontent_id')
 	.get(function(req, res) {
-		Metacontent.findById(res.params.metacontent_id)
+		Metacontent.findById(req.params.metacontent_id)
 			.then(function(metacontent) {
 				res.set('Content-Type', 'application/json; charset=utf-8')
 				res.end(JSON.stringify(metacontent))	
@@ -302,7 +302,7 @@ router.route('/metacontents/:metacontent_id')
 
 router.route('/keywords/:keyword_id')
 	.get(function(req, res) {
-		Keyword.findById(res.params.keyword_id)
+		Keyword.findById(req.params.keyword_id)
 			.then(function(keyword) {
 				res.set('Content-Type', 'application/json; charset=utf-8')
 				res.end(JSON.stringify(keyword))		
