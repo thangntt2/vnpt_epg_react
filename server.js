@@ -291,7 +291,7 @@ router.route('/channels')
 		});
 	})
 
-router.route('/metacontents/:metacontent_id')
+router.route('/metacontent/:metacontent_id')
 	.get(function(req, res) {
 		Metacontent.findById(req.params.metacontent_id)
 			.then(function(metacontent) {
@@ -331,6 +331,7 @@ router.route('/metacontents/query_news')
 router.route('/metacontents/search_news')
 	.get(function(req, res) {
 		if (req.query.sites.indexOf('vnexpress')) {
+			console.log(req.query)
 			vne_scrape.search_vne(req.query.entity)
 				.then(function(articles) {
 					res.set('Content-Type', 'application/json; charset=utf-8');
