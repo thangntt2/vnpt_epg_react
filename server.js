@@ -337,7 +337,7 @@ router.route('/metacontents/search_news')
 			vne_scrape.search_vne(req.query.entity)
 				.then(function(articles) {
 					res.set('Content-Type', 'application/json; charset=utf-8')
-					if (!req.query.full_res)
+					if (Boolean(req.query.full_res))
 						res.end(JSON.stringify(articles))
 					else {
 						let results = articles.forEach(function(article) {
