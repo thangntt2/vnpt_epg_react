@@ -330,12 +330,22 @@ router.route('/metacontents/query_news')
 	})
 router.route('/metacontents/search_news')
 	.get(function(req, res) {
+		console.log(req.query)
+		let scrape_vne = vne_scrape.scrape_vne
 		if (req.query.sites.indexOf('vnexpress')) {
 			console.log(req.query)
 			vne_scrape.search_vne(req.query.entity)
 				.then(function(articles) {
-					res.set('Content-Type', 'application/json; charset=utf-8');
-					res.end(JSON.stringify(articles))
+					res.set('Content-Type', 'application/json; charset=utf-8')
+					if (!req.query.full_res)
+						res.end(JSON.stringify(articles))
+					else {
+						let results = articles.forEach(function(article) {
+							yield(scrape_vne(article.link))
+						})
+						res.set('Content-Type', 'application/json; charset=utf-8');
+						res.end(JSON.stringify(results))
+					}
 				})
 		}
 		
