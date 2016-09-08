@@ -238,7 +238,7 @@ router.route('/channels/:channel_id/metacontents')
 		})	
 	})
 
-router.route('/channels/:channel_id/metacontens')
+router.route('/channels/:channel_id/metacontents')
 	.put(function(req, res) {
 		Metacontent.findById(req.body.id).then(function(metacontent) {
 		   		metacontent.update({
