@@ -333,22 +333,14 @@ router.route('/metacontents/search_news')
 		console.log(req.query)
 		let scrape_vne = vne_scrape.scrape_vne
 		if (req.query.sites.indexOf('vnexpress')) {
-			console.log(req.query)
-			vne_scrape.search_vne(req.query.entity)
-				.then(function(articles) {
+			let promise = (Boolean(req.query.full_res)) 
+						? vne_scrape.search_full(req.query.entity)
+						: vne_scrape.search_vne(req.query.entity)
+			promise.then(function(articles) {
 					res.set('Content-Type', 'application/json; charset=utf-8')
-					if (Boolean(req.query.full_res))
-						res.end(JSON.stringify(articles))
-					else {
-						let results = articles.forEach(function(article) {
-							yield(scrape_vne(article.link))
-						})
-						res.set('Content-Type', 'application/json; charset=utf-8');
-						res.end(JSON.stringify(results))
-					}
+					res.end(JSON.stringify(articles))
 				})
 		}
-		
 	})
 
 router.route('/keywords')
