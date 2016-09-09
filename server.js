@@ -333,7 +333,7 @@ router.route('/metacontents/query_news')
 router.route('/metacontents/search_news')
   .get(function(req, res) {
     if (req.query.sites.indexOf('vnexpress')) {
-      let isFullRes = Boolean(req.query.full_res)
+      let isFullRes = req.query.full_res === 'true'
       let promise = (isFullRes)
             ? vne_scrape.search_full(req.query.entity)
             : vne_scrape.search_vne(req.query.entity)
