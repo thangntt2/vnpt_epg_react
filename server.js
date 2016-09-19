@@ -14,6 +14,7 @@ var Metacontent = app.get('models').Metacontent
 var sequelize = app.get('models').sequelize
 
 var config = require('config').database
+var scrapy_dir = require('config').crawler_dir
 var knex = require('knex')({
   client: 'mysql',
   connection: {
@@ -39,9 +40,15 @@ var client = new wikibot({
   debug: false
 })
 
+//run spiders
+const exec = require('child_process').exec
+const cron = require('node-cron')
+console.log(scrapy_dir)
+cron.schedule('0 7,9,12,14,16,18,22 * * *',
+  exec('cd ' + scrapy_dir + ' && scrapy crawl vne && scarpy crawl dantri'))
+
 app.use(bodyParser.urlencoded({ extended: true}))
 app.use(bodyParser.json())
-
 
 router.get('/channels', function (req, res) {
   Channel.findAll()
@@ -255,8 +262,11 @@ router.route('/channels/:channel_id/metacontents')
         timestamps  : new Date().getTime() / 1000
       },{
         include   : [Channel]
-      }).then(function(res) {
-        res.sendStatus(201)
+      }).then(result => {
+        if (result)
+          res.sendStatus(201)
+        else 
+          res.sendStatus(400)
       })
     })
   })
