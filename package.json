@@ -20,6 +20,12 @@
     "eslint-plugin-react": "^6.2.0"
   },
   "dependencies": {
+    "child_process": "^1.0.2",
+    "node-cron": "^1.1.2",
+    "osmosis": "^1.1.0",
     "request-promise": "^4.1.1"
+  },
+  "scripts": {
+    "start": "babel-node server.js --preset es2017"
   }
 }
