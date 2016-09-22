@@ -24,6 +24,7 @@
     "babel-register": "^6.14.0",
     "child_process": "^1.0.2",
     "config": "^1.21.0",
+    "elasticsearch": "^11.0.1",
     "eslint": "^3.4.0",
     "eslint-config-airbnb": "^11.0.0",
     "eslint-config-google": "^0.6.0",
@@ -34,6 +35,14 @@
     "mysql": "^2.11.1",
     "node-cron": "^1.1.2",
     "osmosis": "^1.1.0",
-    "request-promise": "^4.1.1"
+    "request-promise": "^4.1.1",
+    "superagent": "^2.3.0",
+    "bluebird": "^3.4.6",
+    "body-parser": "^1.15.2",
+    "cors": "^2.8.1",
+    "express": "^4.14.0",
+    "nodemw": "^0.10.1",
+    "scrape-it": "^3.2.0",
+    "sequelize": "^3.24.3"
   }
 }

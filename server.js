@@ -1,3 +1,4 @@
+require("babel-register");
 var cors = require('cors')
 var vne_scrape = require('./vnexpress_scrape')
 var express = require('express')
@@ -15,16 +16,6 @@ var sequelize = app.get('models').sequelize
 
 var config = require('config').database
 var scrapy_dir = require('config').crawler_dir
-var knex = require('knex')({
-  client: 'mysql',
-  connection: {
-    host     : config.host,
-    port   : config.port,
-    user     : config.user,
-    password : config.password,
-    database : config.database
-  },
-})
 
 var port = process.env.PORT || 8089
 var router = express.Router({
@@ -40,12 +31,17 @@ var client = new wikibot({
   debug: false
 })
 
+var elasticsearch = require('elasticsearch')
+var esclient = new elasticsearch.Client({
+  host: 'localhost:8889'
+})
+
 //run spiders
 const exec = require('child_process').exec
 const cron = require('node-cron')
-console.log(scrapy_dir)
 cron.schedule('0 7,9,12,14,16,18,22 * * *',
-  exec('cd ' + scrapy_dir + ' && scrapy crawl vne && scarpy crawl dantri'))
+  exec('curl http://localhost:6800/schedule.json -d project=scrape_vne -d spider=dantri' 
+      + '&& curl http://localhost:6800/schedule.json -d project=scrape_vne -d spider=vne'))
 
 app.use(bodyParser.urlencoded({ extended: true}))
 app.use(bodyParser.json())
@@ -124,34 +120,6 @@ router.route('/channels/:id/keywords')
       res.end(JSON.stringify(listKeywords))  
     })
   })
-
-router.route('/metacontents/search')
-  .get(function(req, res) {
-    if (req.query.entity.length == 0) {
-      res.end('[]')
-      return
-    }
-    knex('vi_wiki_title')
-      .select('title')
-      .whereRaw('LOWER(title) like LOWER(?) collate utf8_bin limit 8'
-        , [req.query.entity + '%'])
-      .then(function(titles) {
-        let rawtt = []
-        res.set('Content-Type', 'application/json charset=utf-8')
-        if (titles) {
-          for (var i = 0; i < titles.length; i++) {
-            rawtt.push(titles[i].title)
-          }
-          res.end(JSON.stringify(rawtt))
-        } else {
-          res.end('[]')
-        }
-      })
-      .catch(function(err) {
-        throw err
-      })
-  })
-
 
 const getFirstItem = function(obj) {
   const key = Object.keys(obj).shift()
@@ -340,18 +308,16 @@ router.route('/metacontents/query_news')
         })
     }
   })
+
 router.route('/metacontents/search_news')
   .get(function(req, res) {
-    if (req.query.sites.indexOf('vnexpress')) {
-      let isFullRes = req.query.full_res === 'true'
-      let promise = (isFullRes)
-            ? vne_scrape.search_full(req.query.entity)
-            : vne_scrape.search_vne(req.query.entity)
-      promise.then(function(articles) {
-        res.set('Content-Type', 'application/json charset=utf-8')
-        res.end(JSON.stringify(articles))
-      })
-    }
+    client.search({
+      q:req.query.entity,
+      fields: ['name', 'description', 'image', 'url']
+    }).then(body => {
+      res.set('Content-Type', 'application/json charset=utf-8')
+      res.end(JSON.stringify(body.hits.hits))
+    })
   })
   
 router.route('/keywords')
@@ -361,6 +327,17 @@ router.route('/keywords')
         res.set('Content-Type', 'application/json charset=utf-8')
         res.end(JSON.stringify(keywords))
       })
+  })
+
+var superagent = require('superagent')
+router.route('/scrapy/schedule')
+  .get((req, res) => {
+    res.set('Content-Type', 'application/json charset=utf-8')
+    superagent
+      .get('http://localhost:6800/listjobs.json?project=scrape_vne')
+      .end((err, result) => {
+        res.end(JSON.stringify(result.body))
+      }) 
   })
 
 app.use('/api', router)
