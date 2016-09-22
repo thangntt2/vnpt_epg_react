@@ -331,7 +331,7 @@ router.route('/metacontents/search_news')
   .get(function(req, res) {
     esclient.search({
       q:req.query.entity,
-      fields: ['name', 'description', 'image', 'url']
+      fields: ['title', 'description', 'image', 'url']
     }).then(body => {
       res.set('Content-Type', 'application/json charset=utf-8')
       res.end(JSON.stringify(body.hits.hits))
