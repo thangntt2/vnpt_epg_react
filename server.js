@@ -309,6 +309,24 @@ router.route('/metacontents/query_news')
     }
   })
 
+router.route('/metacontents/search_wiki')
+  .get((req, res) => {
+    let params = {
+      action: 'opensearch',
+      format: 'json',
+      formatversion: 2,
+      namespace: 0,
+      limit: 10,
+      suggest: true,
+      search: req.query.entity
+    }
+
+    client.api.call(params, function(err, info, next, data) {
+      res.set('Content-Type', 'application/json charset=utf-8')
+      res.end(JSON.stringify(data))
+    })
+  })
+
 router.route('/metacontents/search_news')
   .get(function(req, res) {
     esclient.search({
