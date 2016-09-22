@@ -311,7 +311,7 @@ router.route('/metacontents/query_news')
 
 router.route('/metacontents/search_news')
   .get(function(req, res) {
-    client.search({
+    esclient.search({
       q:req.query.entity,
       fields: ['name', 'description', 'image', 'url']
     }).then(body => {
