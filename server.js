@@ -33,7 +33,7 @@ var client = new wikibot({
 
 var elasticsearch = require('elasticsearch')
 var esclient = new elasticsearch.Client({
-  host: 'localhost:8889'
+  host: 'localhost:9200'
 })
 
 //run spiders
@@ -353,7 +353,7 @@ router.route('/metacontents/search_news')
             },
             filter: {
               terms: {
-                source: req.query.sites
+                source: JSON.parse(req.query.sites)
               }
             }
           }
