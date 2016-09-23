@@ -352,7 +352,7 @@ router.route('/metacontents/search_news')
               }
             },
             filter: {
-              term: {
+              terms: {
                 source: req.query.sites
               }
             }
