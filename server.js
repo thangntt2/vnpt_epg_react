@@ -33,7 +33,7 @@ var client = new wikibot({
 
 var elasticsearch = require('elasticsearch')
 var esclient = new elasticsearch.Client({
-  host: 'localhost:9200'
+  host: 'localhost:8889'
 })
 
 //run spiders
