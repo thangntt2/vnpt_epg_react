@@ -55,6 +55,18 @@ router.get('/channels', function (req, res) {
     })
 })
 
+router.route('/channels/:channel_id/')
+  .delete((req, res) => {
+    Channel.destroy({
+      where: {
+        id : req.params.channel_id
+      }
+    }).then(channel => {
+      if (channel)
+        res.sendStatus(204)
+    })
+  })
+
 router.route('/channels/:channel_id/keywords')
   .delete(function(req, res) {
     Keyword.destroy({
