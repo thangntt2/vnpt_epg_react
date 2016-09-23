@@ -342,8 +342,24 @@ router.route('/metacontents/search_wiki')
 router.route('/metacontents/search_news')
   .get(function(req, res) {
     esclient.search({
-      q:req.query.entity,
-      fields: ['title', 'description', 'image', 'url']
+      body: {
+        query: {
+          bool: {
+            must: {
+              multi_match: {
+                query: req.query.entity,
+                fields: ['title', 'description']
+              }
+            },
+            filter: {
+              term: {
+                source: req.query.sites
+              }
+            }
+          }
+        },
+        fields: ['title', 'description', 'image', 'url', 'source']
+      }
     }).then(body => {
       res.set('Content-Type', 'application/json charset=utf-8')
       res.end(JSON.stringify(body.hits.hits))
