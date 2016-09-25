@@ -1,4 +1,4 @@
-require("babel-register");
+require('babel-register')
 var cors = require('cors')
 var vne_scrape = require('./vnexpress_scrape')
 var express = require('express')
@@ -6,6 +6,8 @@ var app = express()
 var fs = require('fs')
 var bodyParser = require('body-parser')
 var JSON = require('JSON2')
+const moment = require('moment')
+moment.locale('vi')
 
 app.use(cors())
 app.set('models', require('./models'))
@@ -39,9 +41,11 @@ var esclient = new elasticsearch.Client({
 //run spiders
 const exec = require('child_process').exec
 const cron = require('node-cron')
-cron.schedule('0 7,9,12,14,16,18,22 * * *',
+cron.schedule('0 0 7,9,12,14,16,18,22 * * *', () => {
+  console.log('Schedule spiders to crawl at ' + moment().format())
   exec('curl http://localhost:6800/schedule.json -d project=scrape_vne -d spider=dantri' 
-      + '&& curl http://localhost:6800/schedule.json -d project=scrape_vne -d spider=vne'))
+      + '&& curl http://localhost:6800/schedule.json -d project=scrape_vne -d spider=vne')
+})
 
 app.use(bodyParser.urlencoded({ extended: true}))
 app.use(bodyParser.json())
