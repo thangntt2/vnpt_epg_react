@@ -282,6 +282,7 @@ router.get('/channels/number/:number', function(req, res) {
 router.route('/channels')
   .post(function(req, res) {
     Channel.create({
+      id : req.body.id,
       name  : req.body.name,
       icon  : req.body.icon,
       channel : req.body.channel
