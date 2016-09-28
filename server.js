@@ -131,7 +131,8 @@ router.route('/channels/:id/keywords')
           lte   : req.query.end_time
         },
         ChannelId   : req.params.id
-      }
+      }, 
+      order: 'timestamps DESC'
     })
     .then(function(listKeywords){
       res.set('Content-Type', 'application/json charset=utf-8')
@@ -211,7 +212,8 @@ router.route('/channels/:id/metacontents')
           lte   : req.query.end_time
         },
         ChannelId   : req.params.id
-      }
+      },
+      order: 'timestamps DESC',
     })
     .then(function(listMetacontents){
       res.set('Content-Type', 'application/json charset=utf-8')
