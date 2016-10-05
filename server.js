@@ -25,12 +25,14 @@ var router = express.Router({
 })
 const AuthURL = 'https://thangntt.au.auth0.com/oauth/ro'
 var request = require('request')
-var wikibot = require('nodemw')
 
-var client = new wikibot({
-  server : 'vi.wikipedia.org',
-  path:'/w',
-  debug: false
+const MWBot = require('mwbot')
+
+let bot = new MWBot()
+bot.login({
+  apiUrl: 'https://vi.wikipedia.org/w/api.php',
+  username: 'vnptwikibot',
+  password: 'nhuthienthu1',
 })
 
 var elasticsearch = require('elasticsearch')
@@ -137,46 +139,6 @@ router.route('/channels/:id/keywords')
     .then(function(listKeywords){
       res.set('Content-Type', 'application/json charset=utf-8')
       res.end(JSON.stringify(listKeywords))  
-    })
-  })
-
-const getFirstItem = function(obj) {
-  const key = Object.keys(obj).shift()
-  return obj[key]
-}
-
-var replaceAll = function(string, omit, place, prevstring) {
-  if (prevstring && string === prevstring)
-    return string
-  prevstring = string.replace(omit, place)
-  return replaceAll(prevstring, omit, place, string)
-}
-
-router.route('/metacontents/query_wiki')
-  .get(function(req, res) {
-    var entity = req.query.entity
-    res.set('Content-Type', 'application/json charset=utf-8')
-    let params = {
-      format  : 'xml',
-      action  : 'query',
-      continue : '',
-      prop  : 'extracts|pageimages',
-      exintro : '',
-      explaintext: '',
-      rvprop  : 'timestamp|user|comment|content',
-      titles  : entity,
-      pithumbsize : '400'
-    }
-    client.api.call(params, function(err, info, next, data) {
-      var wikiPage = getFirstItem(data.query.pages)
-      var ret = {}
-      ret.name = wikiPage.title
-      ret.url = 'https://vi.wikipedia.org/wiki/' + replaceAll(entity, ' ', '_')
-      if (wikiPage.thumbnail) {
-        ret.image = wikiPage.thumbnail.source
-      }
-      ret.description = wikiPage.extract
-      res.end(JSON.stringify(ret))
     })
   })
 
@@ -318,33 +280,60 @@ router.route('/metacontents')
       res.end(JSON.stringify(metacontens))
     })
   })
-router.route('/metacontents/query_news')
-  .get(function(req,res) {
-    let url = req.query.url
-    if (url.indexOf('vnexpress') > -1) {
-      res.set('Content-Type', 'application/json charset=utf-8')
-      vne_scrape.scrape_vne(url)
-        .then(function(article) {
-          res.end(JSON.stringify(article))
-        })
-    }
-  })
 
 router.route('/metacontents/search_wiki')
   .get((req, res) => {
-    let params = {
+    bot.request({
       action: 'opensearch',
       format: 'json',
       formatversion: 2,
+      redirect: 1,
       namespace: 0,
       limit: 10,
       suggest: true,
-      search: req.query.entity
-    }
-
-    client.api.call(params, function(err, info, next, data) {
-      res.set('Content-Type', 'application/json charset=utf-8')
-      res.end(JSON.stringify(data))
+      search: req.query.entity,
+    }).then(response => {
+      return response[1].map((entity, index) => {
+        return ({
+          title: entity,
+          description: response[2][index],
+          url: response[3][index],
+        })
+      })
+    }).then(results => {
+      let titles
+      results.forEach(entity => {
+        titles = `${titles}|${entity.title}`
+      })
+      bot.request({
+        action: 'query',
+        format: 'json',
+        prop: 'pageimages',
+        titles: titles,
+        redirects: 1,
+        formatversion: 2,
+        piprop: 'thumbnail',
+        pithumbsize: 400,
+        pilimit: 10,
+      }).then(response => {
+        const t = response.query.pages.reduce((pre, page) => {
+          if (page.thumbnail)
+            pre[page.title] = page.thumbnail.source
+          return pre
+        })
+        return t
+      }).then(images => {
+        const value = results.map(result => {
+          return ({
+            title: result.title,
+            description: result.description,
+            url: result.url,
+            image: images[result.title],
+          })
+        })
+        res.set('Content-Type', 'application/json charset=utf-8')
+        res.end(JSON.stringify(value))
+      })
     })
   })
 
@@ -370,8 +359,17 @@ router.route('/metacontents/search_news')
         fields: ['title', 'description', 'image', 'url', 'source']
       }
     }).then(body => {
+      const results = body.hits.hits.map(hit => {
+        return {
+          title: hit.fields.title[0],
+          description: hit.fields.description[0],
+          image: hit.fields.image[0],
+          url: hit.fields.url[0],
+          source: hit.fields.source[0],
+        }
+      })
       res.set('Content-Type', 'application/json charset=utf-8')
-      res.end(JSON.stringify(body.hits.hits))
+      res.end(JSON.stringify(results))
     })
   })
   
