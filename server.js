@@ -303,7 +303,8 @@ router.route('/metacontents/search_wiki')
     }).then(results => {
       const titles = results.reduce((pre,entity) => {
         pre = `${pre}|${entity.title}`
-      })
+        return pre
+      }, '')
       bot.request({
         action: 'query',
         format: 'json',
