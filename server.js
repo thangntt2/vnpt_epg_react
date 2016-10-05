@@ -322,12 +322,15 @@ router.route('/metacontents/search_wiki')
         })
       }).then(images => {
         const value = results.map(result => {
-          return ({
-            title: result.title,
-            description: result.description,
-            url: result.url,
-            image: images[result.title],
-          })
+          if (images[result.title])
+            return ({
+              title: result.title,
+              description: result.description,
+              url: result.url,
+              image: images[result.title],
+              source: 'vi.wikipedia.org',
+            })
+          return result
         })
         res.set('Content-Type', 'application/json charset=utf-8')
         res.end(JSON.stringify(value))
@@ -364,6 +367,7 @@ router.route('/metacontents/search_news')
           image: hit.fields.image[0],
           url: hit.fields.url[0],
           source: hit.fields.source[0],
+          time: hit._index.replace('news_index-', '').replace('_','/').replace('_','/'),
         }
       })
       res.set('Content-Type', 'application/json charset=utf-8')
