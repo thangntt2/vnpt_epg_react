@@ -28,7 +28,7 @@ var request = require('request')
 
 const MWBot = require('mwbot')
 
-let bot = new MWBot()
+const bot = new MWBot()
 bot.login({
   apiUrl: 'https://vi.wikipedia.org/w/api.php',
   username: 'vnptwikibot',
