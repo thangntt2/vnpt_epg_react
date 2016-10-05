@@ -301,9 +301,8 @@ router.route('/metacontents/search_wiki')
         })
       })
     }).then(results => {
-      let titles
-      results.forEach(entity => {
-        titles = `${titles}|${entity.title}`
+      const titles = results.reduce((pre,entity) => {
+        pre = `${pre}|${entity.title}`
       })
       bot.request({
         action: 'query',
@@ -316,12 +315,11 @@ router.route('/metacontents/search_wiki')
         pithumbsize: 400,
         pilimit: 10,
       }).then(response => {
-        const t = response.query.pages.reduce((pre, page) => {
+        return response.query.pages.reduce((pre, page) => {
           if (page.thumbnail)
             pre[page.title] = page.thumbnail.source
           return pre
         })
-        return t
       }).then(images => {
         const value = results.map(result => {
           return ({
