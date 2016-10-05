@@ -360,15 +360,15 @@ router.route('/metacontents/search_news')
         },
         fields: ['title', 'description', 'image', 'url', 'source']
       }
-    }).then(body => body.hits.hits.map(hit => hit.fields))
-    .then(hits => {
-      const results = hits.map(hit => {
+    }).then(body => {
+      const results = body.hits.hits.map(hit => {
         const res = {
-          title: hit.title[0],
-          description: hit.description[0],
-          image: hit.image && hit.image[0],
-          url: hit.url[0],
-          source: hit.source[0],
+          title: hit.fields.title[0],
+          description: hit.fields.description[0],
+          image: hit.fields.image && hit.fields.image[0],
+          url: hit.fields.url[0],
+          source: hit.fields.source[0],
+          time: hit._index.replace('news_index-','').replace('_','/').replace('_','/')
         }
         return res
       })
