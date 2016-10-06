@@ -274,8 +274,14 @@ router.route('/keywords/:keyword_id')
   
 router.route('/metacontents')
   .get(function(req, res) {
-    Metacontent.findAll()
-    .then(function(metacontens) {
+    Metacontent.findAll({
+      where: {
+        timestamps: {
+          gt: new Date().getTime() / 1000 - 24*3600,
+        }
+      },
+      order: 'timestamps DESC',
+    }).then(function(metacontens) {
       res.set('Content-Type', 'application/json charset=utf-8')
       res.end(JSON.stringify(metacontens))
     })
