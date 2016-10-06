@@ -151,7 +151,7 @@ router.route('/channels/:id/metacontents')
       category  : req.body.category,
       image   : req.body.image,
       channel   : {
-        id    : req.body.id
+        id    : req.params.id
       },
       timestamps  : new Date().getTime() / 1000
     }, {
@@ -325,7 +325,7 @@ router.route('/metacontents/search_wiki')
         const value = results.map(result => {
           if (images[result.title])
             return ({
-              title: result.title,
+              name: result.title,
               description: result.description,
               url: result.url,
               image: images[result.title],
@@ -363,7 +363,7 @@ router.route('/metacontents/search_news')
     }).then(body => {
       const results = body.hits.hits.map(hit => {
         const res = {
-          title: hit.fields.title[0],
+          name: hit.fields.title[0],
           description: hit.fields.description[0],
           image: hit.fields.image && hit.fields.image[0],
           url: hit.fields.url[0],
