@@ -1,9 +1,8 @@
 require('babel-register')
 var cors = require('cors')
-var vne_scrape = require('./vnexpress_scrape')
 var express = require('express')
+var jwt = require('express-jwt')
 var app = express()
-var fs = require('fs')
 var bodyParser = require('body-parser')
 var JSON = require('JSON2')
 const moment = require('moment')
@@ -25,6 +24,11 @@ var router = express.Router({
 })
 const AuthURL = 'https://thangntt.au.auth0.com/oauth/ro'
 var request = require('request')
+
+var jwtCheck = jwt({
+  secret: new Buffer('4IYD2lhR6f_WYpyptFktH2gBFduPsvyz5TeZMvWepFVXQlPFeu3IQn9PeIx2Xlwt', 'base64'),
+  audience: 'OTYXYV8Eu0UZ139YKuPk94cX7UhP2pgH'
+})
 
 const MWBot = require('mwbot')
 
@@ -404,6 +408,8 @@ router.route('/scrapy/schedule')
   })
 
 app.use('/api', router)
+
+app.use('/api', jwtCheck)
 
 app.use(function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*')
