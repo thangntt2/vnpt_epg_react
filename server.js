@@ -21,6 +21,22 @@ var router = express.Router({
 const AuthURL = 'https://thangntt.au.auth0.com/oauth/ro'
 var request = require('request')
 
+const { getAccessToken, getClient, getRefreshToken, getUser, saveToken } = require('./models')
+
+const model = {
+  getAccessToken: getAccessToken,
+  getClient: getClient,
+  getUser: getUser,
+  saveToken: saveToken,
+}
+
+var OAuthServer = require('express-oauth-server')
+app.oauth = new OAuthServer({
+  model: model,
+})
+
+app.use(app.oauth.authorize())
+
 const MWBot = require('mwbot')
 
 const bot = new MWBot()
