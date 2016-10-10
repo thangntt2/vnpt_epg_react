@@ -1,9 +1,7 @@
 require('babel-register')
 var cors = require('cors')
-var vne_scrape = require('./vnexpress_scrape')
 var express = require('express')
 var app = express()
-var fs = require('fs')
 var bodyParser = require('body-parser')
 var JSON = require('JSON2')
 const moment = require('moment')
@@ -15,9 +13,6 @@ var Channel = app.get('models').Channel
 var Keyword = app.get('models').Keyword
 var Metacontent = app.get('models').Metacontent
 var sequelize = app.get('models').sequelize
-
-var config = require('config').database
-var scrapy_dir = require('config').crawler_dir
 
 var port = process.env.PORT || 8089
 var router = express.Router({
