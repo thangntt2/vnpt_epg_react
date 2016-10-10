@@ -25,7 +25,9 @@ const { getAccessToken, getClient, getRefreshToken, getUser, saveToken } = requi
 
 const model = {
   getAccessToken: getAccessToken,
-  getClient: getClient,
+  getClient: function() {
+    return { grants: ['password'] }
+  },
   getUser: getUser,
   saveToken: saveToken,
 }
