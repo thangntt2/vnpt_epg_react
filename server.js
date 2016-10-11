@@ -98,10 +98,9 @@ app.get('/login', function(req, res) {
   const password = req.query.password
   res.set('Access-Control-Allow-Origin', '*')
   res.set('Content-Type', 'application/json charset=utf-8')
-  console.log(username, password)
   User.findOne({ where : { username: username } })
   .then(function(user) {
-    if (bcrypt.compareSync(password, user.dataValues.password)) {
+    if (user && user.dataValues && bcrypt.compareSync(password, user.dataValues.password)) {
       Token.create({
         accessToken: randomAsciiString(40),
         accessTokenExpiresOn: (new Date().getTime() + TOKEN_TTL),
