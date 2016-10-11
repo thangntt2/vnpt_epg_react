@@ -114,7 +114,7 @@ app.get('/login', function(req, res) {
         res.end(JSON.stringify(token))
       })
     } else {
-      res.end(JSON.stringify({ error: 'INVALID_USERNAME_OR_PASSWORD'}))
+      res.status(401).end('Invalid user name or password')
     }
   })
 })
@@ -123,7 +123,7 @@ app.use(function auth(req, res, next) {
   const authentication = req.get('Authorization')
   if (!authentication) {
     req.authenticated = false
-    res.status(401).send('INVALID_API_KEY')
+    res.status(401).send('Invalid api key')
     return
   }
   Token.findOne({ where: { accessToken: authentication } })
@@ -133,7 +133,7 @@ app.use(function auth(req, res, next) {
         next()
       }
       if (!req.authenticated) {
-        res.status(401).send('INVALID_API_KEY')
+        res.status(401).send('Invalid api key')
       }
     })
 })
