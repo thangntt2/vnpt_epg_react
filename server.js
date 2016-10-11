@@ -96,8 +96,6 @@ const bcrypt = require('bcrypt-nodejs')
 app.get('/login', function(req, res) {
   const username = req.query.username
   const password = req.query.password
-  res.set('Access-Control-Allow-Origin', '*')
-  res.set('Content-Type', 'application/json charset=utf-8')
   User.findOne({ where : { username: username } })
   .then(function(user) {
     if (user && user.dataValues && bcrypt.compareSync(password, user.dataValues.password)) {
@@ -111,6 +109,8 @@ app.get('/login', function(req, res) {
         include   : [User]
       }).then(function(token){
         user.addAccessTokens(token)
+        res.set('Access-Control-Allow-Origin', '*')
+        res.set('Content-Type', 'application/json charset=utf-8')
         res.end(JSON.stringify(token))
       })
     } else {
@@ -123,7 +123,7 @@ app.use(function auth(req, res, next) {
   const authentication = req.get('Authorization')
   if (!authentication) {
     req.authenticated = false
-    res.status(401).send('Invalid api key')
+    res.status(401).end('Invalid api key')
     return
   }
   Token.findOne({ where: { accessToken: authentication } })
@@ -133,7 +133,7 @@ app.use(function auth(req, res, next) {
         next()
       }
       if (!req.authenticated) {
-        res.status(401).send('Invalid api key')
+        res.status(401).end('Invalid api key')
       }
     })
 })
