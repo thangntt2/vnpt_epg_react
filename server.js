@@ -93,6 +93,33 @@ function randomAsciiString(length) {
 const authentication = require('express-authentication')
 const bcrypt = require('bcrypt-nodejs')
 
+app.get('/login', function(req, res) {
+  const username = req.query.username
+  const password = req.query.password
+  res.set('Access-Control-Allow-Origin', '*')
+  res.set('Content-Type', 'application/json charset=utf-8')
+  console.log(username, password)
+  User.findOne({ where : { username: username } })
+  .then(function(user) {
+    if (bcrypt.compareSync(password, user.dataValues.password)) {
+      Token.create({
+        accessToken: randomAsciiString(40),
+        accessTokenExpiresOn: (new Date().getTime() + TOKEN_TTL),
+        user: {
+          username: username,
+        }
+      }, {
+        include   : [User]
+      }).then(function(token){
+        user.addAccessTokens(token)
+        res.end(JSON.stringify(token))
+      })
+    } else {
+      res.end(JSON.stringify({ error: 'INVALID_USERNAME_OR_PASSWORD'}))
+    }
+  })
+})
+
 app.use(function auth(req, res, next) {
   const authentication = req.get('Authorization')
   if (!authentication) {
@@ -112,34 +139,6 @@ app.use(function auth(req, res, next) {
     })
 })
 
-app.get('/login', function(req, res) {
-  const username = req.query.username
-  const password = req.query.password
-  res.set('Access-Control-Allow-Origin', '*')
-  res.set('Content-Type', 'application/json charset=utf-8')
-  User.findOne({ where : { username: username } })
-  .then(function(user) {
-    if (bcrypt.compareSync(password, user.dataValues.password)) {
-      Token.create({
-        accessToken: randomAsciiString(40),
-        accessTokenExpiresOn: (new Date().getTime() + TOKEN_TTL),
-        user: {
-          username: username,
-        }
-      }, {
-        include   : [User]
-      }).then(function(token){
-        User.findById(username)
-        .then(function(user) {
-          user.addAccessTokens(token)
-          res.end(JSON.stringify(token))
-        })      
-      })
-    } else {
-      res.end(JSON.stringify({ error: 'INVALID_USERNAME_OR_PASSWORD'}))
-    }
-  })
-})
 app.all('/api*', authentication.required())
 //=======================================
 router.get('/channels', function (req, res) {
