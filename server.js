@@ -7,37 +7,27 @@ var JSON = require('JSON2')
 const moment = require('moment')
 moment.locale('vi')
 
-app.use(cors())
 app.set('models', require('./models'))
 var Channel = app.get('models').Channel
 var Keyword = app.get('models').Keyword
 var Metacontent = app.get('models').Metacontent
-var sequelize = app.get('models').sequelize
+var Token = app.get('models').Token
+var User = app.get('models').User
+
+//==seed user===
+const sequelize_fixtures = require('sequelize-fixtures')
+const models = app.get('models')
+sequelize_fixtures.loadFile('config/seed_users.json', models).then(function() {
+  console.log('seeded new users')
+})
+//==============
+
+app.use(cors())
 
 var port = process.env.PORT || 8089
 var router = express.Router({
   mergeParams : true,
 })
-const AuthURL = 'https://thangntt.au.auth0.com/oauth/ro'
-var request = require('request')
-
-const { getAccessToken, getClient, getRefreshToken, getUser, saveToken } = require('./models')
-
-const model = {
-  getAccessToken: getAccessToken,
-  getClient: function() {
-    return { grants: ['password'] }
-  },
-  getUser: getUser,
-  saveToken: saveToken,
-}
-
-var OAuthServer = require('express-oauth-server')
-app.oauth = new OAuthServer({
-  model: model,
-})
-
-app.use(app.oauth.authorize())
 
 const MWBot = require('mwbot')
 
@@ -67,6 +57,91 @@ cron.schedule('0 0 7,9,12,14,16,18,22 * * *', () => {
 app.use(bodyParser.urlencoded({ extended: true}))
 app.use(bodyParser.json())
 
+//========authentication=================
+const TOKEN_TTL = 1000*3600*4
+var crypto = require('crypto')
+
+function randomString(length, chars) {
+  if (!chars) {
+    throw new Error('Argument \'chars\' is undefined')
+  }
+
+  var charsLength = chars.length
+  if (charsLength > 256) {
+    throw new Error('Argument \'chars\' should not have more than 256 characters'
+      + ', otherwise unpredictability will be broken')
+  }
+
+  var randomBytes = crypto.randomBytes(length)
+  var result = new Array(length)
+
+  var cursor = 0
+  for (var i = 0; i < length; i++) {
+    cursor += randomBytes[i]
+    result[i] = chars[cursor % charsLength]
+  }
+
+  return result.join('')
+}
+
+/** Sync */
+function randomAsciiString(length) {
+  return randomString(length,
+    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
+}
+
+const authentication = require('express-authentication')
+const bcrypt = require('bcrypt-nodejs')
+
+app.use(function auth(req, res, next) {
+  const authentication = req.get('Authorization')
+  if (!authentication) {
+    req.authenticated = false
+    res.status(401).send('INVALID_API_KEY')
+    return
+  }
+  Token.findOne({ where: { accessToken: authentication } })
+    .then(function(token) {
+      if (token && token.dataValues.accessTokenExpiresOn < new Date().getTime() + TOKEN_TTL) {
+        req.authenticated = true
+        next()
+      }
+      if (!req.authenticated) {
+        res.status(401).send('INVALID_API_KEY')
+      }
+    })
+})
+
+app.get('/login', function(req, res) {
+  const username = req.query.username
+  const password = req.query.password
+  res.set('Access-Control-Allow-Origin', '*')
+  res.set('Content-Type', 'application/json charset=utf-8')
+  User.findOne({ where : { username: username } })
+  .then(function(user) {
+    if (bcrypt.compareSync(password, user.dataValues.password)) {
+      Token.create({
+        accessToken: randomAsciiString(40),
+        accessTokenExpiresOn: (new Date().getTime() + TOKEN_TTL),
+        user: {
+          username: username,
+        }
+      }, {
+        include   : [User]
+      }).then(function(token){
+        User.findById(username)
+        .then(function(user) {
+          user.addAccessTokens(token)
+          res.end(JSON.stringify(token))
+        })      
+      })
+    } else {
+      res.end(JSON.stringify({ error: 'INVALID_USERNAME_OR_PASSWORD'}))
+    }
+  })
+})
+app.all('/api*', authentication.required())
+//=======================================
 router.get('/channels', function (req, res) {
   Channel.findAll()
     .then(function(listChannels) {
