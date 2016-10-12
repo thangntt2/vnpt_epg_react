@@ -123,17 +123,18 @@ app.use(function auth(req, res, next) {
   const authentication = req.get('Authorization')
   if (!authentication) {
     req.authenticated = false
-    res.status(301).redirect('/login')
+    res.status(401).end('Invalid api key')
     return
   }
   Token.findOne({ where: { accessToken: authentication } })
     .then(function(token) {
-      if (token && token.dataValues.accessTokenExpiresOn < new Date().getTime() + TOKEN_TTL) {
+      if (token && token.dataValues.accessTokenExpiresOn > new Date().getTime()) {
         req.authenticated = true
         next()
       }
       if (!req.authenticated) {
-        res.status(301).redirect('/login')
+        req.authenticated = false
+        res.status(401).end('Invalid api key')
       }
     })
 })
