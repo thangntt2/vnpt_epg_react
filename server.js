@@ -123,7 +123,7 @@ app.use(function auth(req, res, next) {
   const authentication = req.get('Authorization')
   if (!authentication) {
     req.authenticated = false
-    res.status(401).end('Invalid api key')
+    res.status(301).redirect('/login')
     return
   }
   Token.findOne({ where: { accessToken: authentication } })
@@ -133,7 +133,7 @@ app.use(function auth(req, res, next) {
         next()
       }
       if (!req.authenticated) {
-        res.status(401).end('Invalid api key')
+        res.status(301).redirect('/login')
       }
     })
 })
