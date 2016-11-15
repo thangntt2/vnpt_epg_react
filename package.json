@@ -19,6 +19,7 @@
     "eslint-plugin-react": "^6.2.0"
   },
   "dependencies": {
+    "JSON2": "^0.1.0",
     "babel-cli": "^6.14.0",
     "babel-preset-es2017": "^6.14.0",
     "babel-register": "^6.14.0",

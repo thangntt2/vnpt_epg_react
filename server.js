@@ -492,7 +492,11 @@ router.route('/scrapy/schedule')
     superagent
       .get('http://localhost:6800/listjobs.json?project=scrape_vne')
       .end((err, result) => {
-        res.end(JSON.stringify(result.body))
+        if (result) {
+          res.end(JSON.stringify(result.body))
+        } else {
+          res.end(JSON.stringify({}))
+        }
       }) 
   })
 
