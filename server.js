@@ -40,7 +40,7 @@ bot.login({
 
 var elasticsearch = require('elasticsearch')
 var esclient = new elasticsearch.Client({
-  host: 'localhost:8889'
+  host: 'elasticsearch:8889'
 })
 
 //run spiders
@@ -48,10 +48,10 @@ const exec = require('child_process').exec
 const cron = require('node-cron')
 cron.schedule('0 0 7,9,12,14,16,18,22 * * *', () => {
   console.log('Schedule spiders to crawl at ' + moment().format())
-  exec('curl http://localhost:6800/schedule.json -d project=scrape_vne -d spider=dantri' 
-      + '&& curl http://localhost:6800/schedule.json -d project=scrape_vne -d spider=vne'
-      + '&& curl http://localhost:6800/schedule.json -d project=scrape_vne -d spider=xahoithongtin'
-      + '&& curl http://localhost:6800/schedule.json -d project=scrape_vne -d spider=vnmedia')
+  exec('curl http://scrapyd:6800/schedule.json -d project=scrape_vne -d spider=dantri' 
+      + '&& curl http://scrapyd:6800/schedule.json -d project=scrape_vne -d spider=vne'
+      + '&& curl http://scrapyd:6800/schedule.json -d project=scrape_vne -d spider=xahoithongtin'
+      + '&& curl http://scrapyd:6800/schedule.json -d project=scrape_vne -d spider=vnmedia')
 })
 
 app.use(bodyParser.urlencoded({ extended: true}))
@@ -490,7 +490,7 @@ router.route('/scrapy/schedule')
   .get((req, res) => {
     res.set('Content-Type', 'application/json charset=utf-8')
     superagent
-      .get('http://localhost:6800/listjobs.json?project=scrape_vne')
+      .get('http://scrapyd:6800/listjobs.json?project=scrape_vne')
       .end((err, result) => {
         if (result) {
           res.end(JSON.stringify(result.body))
