@@ -1,3 +1,4 @@
+//=========import========================
 require('babel-register')
 var cors = require('cors')
 var express = require('express')
@@ -13,24 +14,35 @@ var Keyword = app.get('models').Keyword
 var Metacontent = app.get('models').Metacontent
 var Token = app.get('models').Token
 var User = app.get('models').User
+const config = require('config').constant
 
-//==seed user===
+//==========seed user================
 const sequelize_fixtures = require('sequelize-fixtures')
 const models = app.get('models')
 sequelize_fixtures.loadFile('config/seed_users.json', models).then(function() {
   console.log('seeded new users')
 })
-//==============
 
+//========constant=======================
+const ELASTICHSEARCH_URL = process.env.ELASTICHSEARCH_URL || config.ELASTICHSEARCH_URL
+const ELASTICHSEARCH_PORT = process.env.ELASTICHSEARCH_PORT || config.ELASTICHSEARCH_PORT
+const SCRAPYD_URL = process.env.SCRAPYD_URL || config.SCRAPYD_URL
+const SCRAPYD_PORT = process.env.SCRAPYD_PORT || config.SCRAPYD_PORT
+const MYSQL_URL = process.env.MYSQL_URL || config.MYSQL_URL
+const MYSQL_PORT = process.env.MYSQL_PORT || config.MYSQL_PORT
+const PORT = process.env.PORT || config.PORT
+
+//=========setup server===============
 app.use(cors())
-
-var port = process.env.PORT || 8089
+var port = PORT
 var router = express.Router({
   mergeParams : true,
 })
+app.use(bodyParser.urlencoded({ extended: true}))
+app.use(bodyParser.json())
 
+//============wikibot=================
 const MWBot = require('mwbot')
-
 const bot = new MWBot()
 bot.login({
   apiUrl: 'https://vi.wikipedia.org/w/api.php',
@@ -38,24 +50,22 @@ bot.login({
   password: 'nhuthienthu1',
 })
 
+//===========Elastisearch==============
 var elasticsearch = require('elasticsearch')
 var esclient = new elasticsearch.Client({
-  host: 'elasticsearch:8889'
+  host: `${ELASTICHSEARCH_URL}:${ELASTICHSEARCH_PORT}`
 })
 
-//run spiders
+//==========run spiders=================
 const exec = require('child_process').exec
 const cron = require('node-cron')
-cron.schedule('0 0 7,9,12,14,16,18,22 * * *', () => {
+cron.schedule('0 43 * * * *', () => {
   console.log('Schedule spiders to crawl at ' + moment().format())
-  exec('curl http://scrapyd:6800/schedule.json -d project=scrape_vne -d spider=dantri' 
-      + '&& curl http://scrapyd:6800/schedule.json -d project=scrape_vne -d spider=vne'
-      + '&& curl http://scrapyd:6800/schedule.json -d project=scrape_vne -d spider=xahoithongtin'
-      + '&& curl http://scrapyd:6800/schedule.json -d project=scrape_vne -d spider=vnmedia')
+  exec(`curl http://${SCRAPYD_URL}:${SCRAPYD_PORT}/schedule.json -d project=scrape_vne -d spider=dantri` 
+      + `&& curl http://${SCRAPYD_URL}:${SCRAPYD_PORT}/schedule.json -d project=scrape_vne -d spider=vne`
+      + `&& curl http://${SCRAPYD_URL}:${SCRAPYD_PORT}/schedule.json -d project=scrape_vne -d spider=xahoithongtin`
+      + `&& curl http://${SCRAPYD_URL}:${SCRAPYD_PORT}/schedule.json -d project=scrape_vne -d spider=vnmedia`)
 })
-
-app.use(bodyParser.urlencoded({ extended: true}))
-app.use(bodyParser.json())
 
 //========authentication=================
 const TOKEN_TTL = 1000*3600*4
@@ -498,6 +508,26 @@ router.route('/scrapy/schedule')
           res.end(JSON.stringify({}))
         }
       }) 
+  })
+
+router.route('/users')
+  .get(function(req, res) {
+    User.findAll()
+      .then(function(users) {
+        res.set('Content-Type', 'application/json charset=utf-8')
+        res.end(JSON.stringify(users))
+      })
+  })
+
+router.route('/users')
+  .post(function(req, res) {
+    User.create({
+      username: res.body.username,
+      password: bcrypt.hashSync(res.body.password),
+    })
+    .then(function() {
+      res.sendStatus(201)
+    })
   })
 
 app.use('/api', router)

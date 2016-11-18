@@ -1,13 +1,15 @@
 // models/index.js
 var Sequelize = require('sequelize')
 var config = require('config').database
+const host = process.env.MYSQL_HOST || config.host
+const port = process.env.MYSQL_PORT || config.port
 
 var sequelize = new Sequelize(
   config.database,
   config.user,
   config.password, {
-    host: config.host,
-    port: config.port
+    host: host,
+    port: port
   },
   {define: {charset: 'utf8mb4', collate:'utf8mb4_bin'}})
 
