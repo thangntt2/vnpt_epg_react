@@ -3,6 +3,8 @@
     "model": "User",
     "data": {
       "username": "thangtrinh",
+      "level": "admin",
+      "name": "Trịnh Quyết Thắng",
       "password": "$2a$08$RCLwAp7C/NvbflfrM73Hb.OZiSWZrV7nAOuJnTvKjkzmeM2RFeMu2"
     }
   },
@@ -10,6 +12,8 @@
     "model": "User",
     "data": {
       "username": "VNPT",
+      "level": "admin",
+      "name": "MyTV admin",
       "password": "$2a$08$7Uba4RAYcTgCs6COF.wx3.NVgCloU1CN6j25Clx9FofoyMa0lnpeO"
     }
   }
