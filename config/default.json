@@ -8,7 +8,7 @@
 	},
   "constant": {
     "ELASTICHSEARCH_URL": "localhost",
-    "ELASTICHSEARCH_PORT": 8889,
+    "ELASTICHSEARCH_PORT": 9200,
     "SCRAPYD_URL": "localhost",
     "SCRAPYD_PORT": 6800,
     "PORT": 8089
