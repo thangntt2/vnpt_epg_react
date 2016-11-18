@@ -498,7 +498,7 @@ router.route('/scrapy/schedule')
   .get((req, res) => {
     res.set('Content-Type', 'application/json charset=utf-8')
     superagent
-      .get('http://scrapyd:6800/listjobs.json?project=scrape_vne')
+      .get(`${SCRAPYD_URL}:${SCRAPYD_PORT}/listjobs.json?project=scrape_vne`)
       .end((err, result) => {
         if (result) {
           res.end(JSON.stringify(result.body))
