@@ -3,11 +3,14 @@ var Sequelize = require('sequelize')
 var config = require('config').database
 const host = process.env.MYSQL_HOST || config.host
 const port = process.env.MYSQL_PORT || config.port
+const db = process.env.MYSQL_DB || config.database
+const user = process.env.MYSQL_USER || config.user
+const password = process.env.MYSQL_PW || config.password
 
 var sequelize = new Sequelize(
-  config.database,
-  config.user,
-  config.password, {
+  db,
+  user,
+  password, {
     host: host,
     port: port
   },

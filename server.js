@@ -28,8 +28,6 @@ const ELASTICHSEARCH_URL = process.env.ELASTICHSEARCH_URL || config.ELASTICHSEAR
 const ELASTICHSEARCH_PORT = process.env.ELASTICHSEARCH_PORT || config.ELASTICHSEARCH_PORT
 const SCRAPYD_URL = process.env.SCRAPYD_URL || config.SCRAPYD_URL
 const SCRAPYD_PORT = process.env.SCRAPYD_PORT || config.SCRAPYD_PORT
-const MYSQL_URL = process.env.MYSQL_URL || config.MYSQL_URL
-const MYSQL_PORT = process.env.MYSQL_PORT || config.MYSQL_PORT
 const PORT = process.env.PORT || config.PORT
 
 //=========setup server===============

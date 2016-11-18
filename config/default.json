@@ -1,0 +1,16 @@
+{
+	"database": {
+		"database"	: "vnpt_epg",
+		"user"		: "root",
+		"password" 	: "S3cr3t!!",
+		"port"		: 3306,
+    "host"  : "localhost"
+	},
+  "constant": {
+    "ELASTICHSEARCH_URL": "localhost",
+    "ELASTICHSEARCH_PORT": 8889,
+    "SCRAPYD_URL": "localhost",
+    "SCRAPYD_PORT": 6800,
+    "PORT": 8089
+  }
+}
