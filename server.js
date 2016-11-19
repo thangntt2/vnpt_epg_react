@@ -176,6 +176,34 @@ router.route('/channels/:channel_id/')
     })
   })
 
+router.route('/users/:user_id')
+  .delete((req, res) => {
+    //==========check if user can delete another user=========
+    const password = req.body.password
+    const authentication = req.get('Authorization')
+    Token.findOne({ where: { accessToken: authentication } })
+    .then(function(token) {
+      return token.dataValues.UserUsername
+    })
+    .then(function(username) {
+      User.findOne({ where: { username: username }})
+      .then(function(user) {
+        if (user.level === 'admin' && bcrypt.compareSync(password, user.dataValues.password)) {
+          User.destroy({
+            where: {
+              username: req.params.user_id
+            }
+          }).then(user => {
+            if (user)
+              res.sendStatus(204)
+          })
+        } else {
+          res.sendStatus(403)
+        }
+      })
+    })
+  })
+
 router.route('/channels/:channel_id/keywords')
   .delete(function(req, res) {
     Keyword.destroy({
