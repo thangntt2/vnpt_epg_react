@@ -520,10 +520,10 @@ router.route('/users')
 router.route('/users')
   .post(function(req, res) {
     User.create({
-      username: res.body.username,
-      password: bcrypt.hashSync(res.body.password),
-      level: res.body.level,
-      name: res.body.name,
+      username: req.body.username,
+      password: bcrypt.hashSync(req.body.password),
+      level: req.body.level,
+      name: req.body.name,
     })
     .then(function() {
       res.sendStatus(201)
