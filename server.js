@@ -522,6 +522,8 @@ router.route('/users')
     User.create({
       username: res.body.username,
       password: bcrypt.hashSync(res.body.password),
+      level: res.body.level,
+      name: res.body.name,
     })
     .then(function() {
       res.sendStatus(201)
