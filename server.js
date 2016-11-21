@@ -202,7 +202,7 @@ router.route('/users/:user_id')
               res.sendStatus(204)
           })
         } else {
-          res.sendStatus(403)
+          res.status(403).end('Invalid password, deletion\'s rejected')
         }
       })
     })
@@ -349,7 +349,7 @@ router.route('/channels/:channel_id/metacontents')
         if (result)
           res.sendStatus(201)
         else 
-          res.sendStatus(400)
+          res.status(400).end('Cannot find metacontent with id: ' + req.body.id + ' and channel id = ' + req.params.channel_id)
       })
     })
   })
