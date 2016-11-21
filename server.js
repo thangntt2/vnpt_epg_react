@@ -118,7 +118,9 @@ app.get('/login', function(req, res) {
       }).then(function(token){
         user.addAccessTokens(token)
         const sendToken = {
-          ...token,
+          id: token.dataValues.id,
+          accessTokenExpiresOn: token.dataValues.accessTokenExpiresOn,
+          accessToken: token.dataValues.accessToken,
           level: user.dataValues.level,
         }
         res.set('Access-Control-Allow-Origin', '*')
