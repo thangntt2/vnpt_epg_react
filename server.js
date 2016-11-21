@@ -117,9 +117,13 @@ app.get('/login', function(req, res) {
         include   : [User]
       }).then(function(token){
         user.addAccessTokens(token)
+        const sendToken = {
+          ...token,
+          level: user.dataValues.level,
+        }
         res.set('Access-Control-Allow-Origin', '*')
         res.set('Content-Type', 'application/json charset=utf-8')
-        res.end(JSON.stringify(token))
+        res.end(JSON.stringify(sendToken))
       })
     } else {
       res.status(401).end('Invalid user name or password')
