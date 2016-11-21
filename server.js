@@ -243,7 +243,7 @@ router.route('/channels/:id/keywords')
       })
       res.sendStatus(201)
     }).catch(function(error) {
-      res.status(400).end(JSON.stringify(error))
+      res.status(400).end(JSON.stringify(error.message))
     })
   })
 
@@ -300,7 +300,7 @@ router.route('/channels/:id/metacontents')
       })
       res.sendStatus(201)
     }).catch(function(error) {
-      res.status(400).end(JSON.stringify(error))
+      res.status(400).end(JSON.stringify(error.message))
     })
   })
 
@@ -391,7 +391,7 @@ router.route('/channels')
       res.sendStatus(201)
       res.end('Channel created with id = ' + channel.id)
     }).catch(function(error) {
-      res.status(400).end(JSON.stringify(error))
+      res.status(400).end(JSON.stringify(error.message))
     })
   })
 
@@ -569,7 +569,7 @@ router.route('/users')
       res.sendStatus(201)
     })
     .catch(function(error) {
-      res.status(400).end(JSON.stringify(error))
+      res.status(400).end(JSON.stringify(error.message))
     })
   })
 
