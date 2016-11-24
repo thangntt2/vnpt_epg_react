@@ -22,6 +22,7 @@ var models = [
   'Metacontent',
   'User',
   'Token',
+  'NewsProvider',
 ]
 
 models.forEach(function(model) {
@@ -35,7 +36,7 @@ models.forEach(function(model) {
   m.Metacontent.belongsTo(m.Channel)
   //===========================
   m.User.hasMany(m.Token, { onDelete: 'CASCADE' })
-  m.Token.belongsTo(m.User, { onDelete: 'CASCADE' })
+  m.Token.belongsTo(m.User)
 })(module.exports)
 
 models.forEach(function(model) {

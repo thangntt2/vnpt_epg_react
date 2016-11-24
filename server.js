@@ -14,6 +14,7 @@ var Keyword = app.get('models').Keyword
 var Metacontent = app.get('models').Metacontent
 var Token = app.get('models').Token
 var User = app.get('models').User
+var NewsProvider = app.get('models').NewsProvider
 const config = require('config').constant
 
 //==========seed user================
@@ -564,6 +565,32 @@ router.route('/users')
       password: bcrypt.hashSync(req.body.password),
       level: req.body.level,
       name: req.body.name,
+    })
+    .then(function() {
+      res.sendStatus(201)
+    })
+    .catch(function(error) {
+      res.status(400).end(JSON.stringify(error.message))
+    })
+  })
+
+router.route('/newsprovider')
+  .get(function(req, res) {
+    NewsProvider.findAll()
+      .then(function(newsproviders) {
+        res.set('Content-Type', 'application/json charset=utf-8')
+        res.end(JSON.stringify(newsproviders))
+      })
+      .catch(function(error) {
+        res.status(404).end(JSON.stringify(error.message))
+      })
+  })
+
+router.route('/NewsProvider')
+  .post(function(req, res) {
+    NewsProvider.create({
+      name: req.body.name,
+      baseurl: req.body.baseurl,
     })
     .then(function() {
       res.sendStatus(201)
