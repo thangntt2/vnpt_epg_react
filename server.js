@@ -60,10 +60,7 @@ const exec = require('child_process').exec
 const cron = require('node-cron')
 cron.schedule('0 43 * * * *', () => {
   console.log('Schedule spiders to crawl at ' + moment().format())
-  exec(`curl http://${SCRAPYD_URL}:${SCRAPYD_PORT}/schedule.json -d project=scrape_vne -d spider=dantri` 
-      + `&& curl http://${SCRAPYD_URL}:${SCRAPYD_PORT}/schedule.json -d project=scrape_vne -d spider=vne`
-      + `&& curl http://${SCRAPYD_URL}:${SCRAPYD_PORT}/schedule.json -d project=scrape_vne -d spider=xahoithongtin`
-      + `&& curl http://${SCRAPYD_URL}:${SCRAPYD_PORT}/schedule.json -d project=scrape_vne -d spider=vnmedia`)
+  exec(`curl http://${SCRAPYD_URL}:${SCRAPYD_PORT}/schedule.json -d project=scrape_vne -d spider=all`)
 })
 
 //========authentication=================
