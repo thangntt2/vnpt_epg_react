@@ -180,6 +180,8 @@ router.route('/channels/:channel_id/')
     }).then(channel => {
       if (channel)
         res.sendStatus(204)
+    }).catch(error => {
+      res.status(404).end(JSON.stringify(error.message))
     })
   })
 
@@ -586,7 +588,7 @@ router.route('/newsprovider')
       })
   })
 
-router.route('/NewsProvider')
+router.route('/newsprovider')
   .post(function(req, res) {
     NewsProvider.create({
       name: req.body.name,
@@ -597,6 +599,19 @@ router.route('/NewsProvider')
     })
     .catch(function(error) {
       res.status(400).end(JSON.stringify(error.message))
+    })
+  })
+
+router.route('/NewsProvider')
+  .delete(function(req, res) {
+    NewsProvider.destroy({
+      where: {
+        name: req.body.name,
+      }
+    }).then(function() {
+      res.sendStatus(204)
+    }).catch(error => {
+      res.status(404).end(JSON.stringify(error.message))
     })
   })
 
