@@ -504,8 +504,7 @@ router.route('/metacontents/search_news')
               }
             }
           }
-        },
-        fields: ['title', 'description', 'image', 'url', 'source']
+        }
       }
     }).then(body => {
       const results = body.hits.hits.map(hit => {
