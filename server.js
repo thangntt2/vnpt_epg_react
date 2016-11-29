@@ -58,12 +58,12 @@ var esclient = new elasticsearch.Client({
 //==========run spiders=================
 const exec = require('child_process').exec
 const cron = require('node-cron')
-cron.schedule('0 43 * * * *', () => {
+cron.schedule('0 25 * * * *', () => {
   NewsProvider.findAll()
     .then(function(newsproviders) {
-      newsproviders.foreach(newsp => {
-        console.log(`Schedule spiders to crawl ${newsp} at ${moment().format()}`)
-        exec(`curl http://${SCRAPYD_URL}:${SCRAPYD_PORT}/schedule.json -d project=scrape_vne -d spider=all -d newsprovider=${newsp}`)
+      newsproviders.forEach(newsp => {
+        console.log(`Schedule spiders to crawl ${newsp.name} at ${moment().format()}`)
+        exec(`curl http://${SCRAPYD_URL}:${SCRAPYD_PORT}/schedule.json -d project=scrape_vne -d spider=all -d newsprovider=${newsp.name}`)
       })
     })
     .catch(function(error) {
