@@ -512,8 +512,7 @@ router.route('/metacontents/search_news')
               }
             }
           }
-        },
-        fields: ['title', 'description', 'image', 'url', 'source']
+        }
       }
     }).then(body => {
       const results = body.hits.hits.map(hit => {
@@ -529,6 +528,10 @@ router.route('/metacontents/search_news')
       })
       res.set('Content-Type', 'application/json charset=utf-8')
       res.end(JSON.stringify(results))
+    }).catch(error => {
+      console.log(JSON.stringify(error))
+      res.set('Content-Type', 'application/json charset=utf-8')
+      res.end(JSON.stringify('[]'))
     })
   })
   
