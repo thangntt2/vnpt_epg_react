@@ -532,7 +532,7 @@ router.route('/metacontents/search_news')
     }).catch(error => {
       console.log(JSON.stringify(error))
       res.set('Content-Type', 'application/json charset=utf-8')
-      res.end(JSON.stringify('[]'))
+      res.end(JSON.stringify([]))
     })
   })
   
