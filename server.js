@@ -446,6 +446,7 @@ router.route('/metacontents/search_wiki')
       namespace: 0,
       limit: 10,
       suggest: true,
+      redirects: 'resolve',
       search: req.query.entity,
     }).then(response => {
       return response[1].map((entity, index) => {
