@@ -604,6 +604,7 @@ router.route('/newsprovider')
       baseurl: req.body.baseurl,
     })
     .then(function() {
+      exec(`curl http://${SCRAPYD_URL}:${SCRAPYD_PORT}/schedule.json -d project=scrape_vne -d spider=all -d newsprovider=${req.body.name}`)
       res.sendStatus(201)
     })
     .catch(function(error) {
