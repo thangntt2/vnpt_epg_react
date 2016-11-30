@@ -517,14 +517,8 @@ router.route('/metacontents/search_news')
       }
     }).then(body => {
       const results = body.hits.hits.map(hit => {
-        const res = {
-          name: hit.fields.title[0],
-          description: hit.fields.description[0],
-          image: hit.fields.image && hit.fields.image[0],
-          url: hit.fields.url[0],
-          source: hit.fields.source[0],
-          time: hit._index.replace('news_index-','').replace('_','/').replace('_','/')
-        }
+        var res = hit._source
+        res.time = hit._source.date
         return res
       })
       res.set('Content-Type', 'application/json charset=utf-8')
